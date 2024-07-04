@@ -1,0 +1,81 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug part 1 sample 'aoc_2023_day10'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=aoc_2023_day10",
+                    "--package=aoc_2023_day10"
+                ],
+                "filter": {
+                    "name": "aoc_2023_day10",
+                    "kind": "bin"
+                }
+            },
+            "args": ["-p1"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug part 2 sample 'aoc_2023_day10'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=aoc_2023_day10",
+                    "--package=aoc_2023_day10"
+                ],
+                "filter": {
+                    "name": "aoc_2023_day10",
+                    "kind": "bin"
+                }
+            },
+            "args": ["-p2"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug both parts real input 'aoc_2023_day10'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=aoc_2023_day10",
+                    "--package=aoc_2023_day10"
+                ],
+                "filter": {
+                    "name": "aoc_2023_day10",
+                    "kind": "bin"
+                }
+            },
+            "args": ["-i input.txt -p1 -p2"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'aoc_2023_day10'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=aoc_2023_day10",
+                    "--package=aoc_2023_day10"
+                ],
+                "filter": {
+                    "name": "aoc_2023_day10",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
