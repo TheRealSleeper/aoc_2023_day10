@@ -42,31 +42,59 @@ enum Direction {
 
 fn main() {
     let mut part1 = false;
-    let mut _part2 = false;
+    let mut part2 = false;
     let mut path: Option<String> = None;
     let mut verbose = false;
     let mut args = args().skip(1);
 
+    let help_txt = "This solves the challenge found at https://adventofcode.com/2023/day/10\n\
+        The following are valid commands:\n\
+        -o  | --open    : Uses specified input file\n\
+        -h  | --help    : opens this help page\n\
+        -1 | --part1   : solves part 1 of the challenge
+        -2 | --part2   : solves part 2 of the challenge (not implemented yet)\n\
+        -v  | --verbose : prints each pipe that gets checked\n\n\
+        Choose only part 1 or part 2 if using sample input, as the sample are different.\n";
+
     while let Some(arg) = args.next() {
-        match arg.as_str() {
-            "-i" | "--input" => path = Some(args.next().expect("No path provided!")),
-            "-p1" | "--part1" => part1 = true,
-            "-p2" | "--part2" => _part2 = true,
-            "-v" | "--verbose" => verbose = true,
-            "-h" | "--help" => {
-                print!(
-                    "This solves the challenge found at https://adventofcode.com/2023/day/10\n\
-                    The following are valid commands:\n\
-                    -o  | --open    : Uses specified input file\n\
-                    -h  | --help    : opens this help page\n\
-                    -p1 | --part1   : solves part 1 of the challenge
-                    -p2 | --part2   : solves part 2 of the challenge (not implemented yet)\n\
-                    -v  | --verbose : prints each pipe that gets checked\n\n\
-                    Choose only part 1 or part 2 if using sample input, as the sample are different.\n"
-                );
-                return;
+        if arg.chars().nth(0).unwrap() == '-' {
+            if arg.chars().nth(1).unwrap_or('\0') != '-' {
+                for ch in arg.chars().skip(1) {
+                    match ch {
+                        'i' => path = Some(args.next().expect("No path provided!")),
+                        '1' => part1 = true,
+                        '2' => part2 = true,
+                        'v' => verbose = true,
+                        'h' => {
+                            println!("{}", help_txt);
+                            return;
+                        }
+                        _ => println!("Ignoring unkown option '{}'", ch),
+                    }
+                }
+            } else {
+                let st = arg.chars().skip(2).collect::<String>();
+                match st.as_str() {
+                    "input" => path = Some(args.next().expect("No path provided!")),
+                    "part1" => part1 = true,
+                    "part2" => part2 = true,
+                    "verbose" => verbose = true,
+                    "help" => {
+                        print!(
+                            "This solves the challenge found at https://adventofcode.com/2023/day/10\n\
+                            The following are valid options:\n\
+                            -i  | --input    : Uses specified input file\n\
+                            -h  | --help    : opens this help page\n\
+                            -1 | --part1   : solves part 1 of the challenge
+                            -2 | --part2   : solves part 2 of the challenge (not implemented yet)\n\
+                            -v  | --verbose : prints each pipe that gets checked\n\n\
+                            Choose only part 1 or part 2 if using sample input, as the sample inputs are different.\n"
+                        );
+                        return;
+                    }
+                    _ => println!("Ignoring unkown option '{}'", st),
+                }
             }
-            _ => {}
         }
     }
 
@@ -93,11 +121,6 @@ fn main() {
          L.L7LFJ|||||FJL7||LJ\n\
          L7JLJL-JLJLJL--JLJ.L"
             .to_string()
-
-        // "F--7.\n\
-        //  |..L7\n\
-        //  S---J"
-        //     .to_string()
     };
 
     let mut map = content
@@ -122,13 +145,13 @@ fn main() {
     let mut starting_x = 0;
     let mut starting_y = 0;
 
-    'search_row: for y in 0..map.len() {
+    'search_start: for y in 0..map.len() {
         for x in 0..map[y].len() {
             if map[y][x].0 == Pipe::Entry {
                 map[y][x].1 = true;
                 starting_x = x;
                 starting_y = y;
-                break 'search_row;
+                break 'search_start;
             }
         }
     }
@@ -144,9 +167,7 @@ fn main() {
 
         match prev_direction {
             Direction::None => {
-                if [Pipe::RightDown, Pipe::RightUp, Pipe::Horizontal]
-                    .contains(&map[y][x - 1].0) 
-                {
+                if [Pipe::RightDown, Pipe::RightUp, Pipe::Horizontal].contains(&map[y][x - 1].0) {
                     prev_direction = Direction::Left;
                     x -= 1;
                 } else if [Pipe::RightDown, Pipe::LeftDown, Pipe::Vertical]
@@ -159,9 +180,7 @@ fn main() {
                 {
                     prev_direction = Direction::Right;
                     x += 1;
-                } else if [Pipe::RightUp, Pipe::LeftUp, Pipe::Vertical]
-                    .contains(&map[y + 1][x].0) 
-                {
+                } else if [Pipe::RightUp, Pipe::LeftUp, Pipe::Vertical].contains(&map[y + 1][x].0) {
                     prev_direction = Direction::Down;
                     y += 1;
                 } else {
@@ -272,7 +291,7 @@ fn main() {
         }
     }
 
-    if _part2 {
+    if part2 {
         let mut interior_tiles = 0;
 
         // Replace the entry point with a directional Pipe so that counting works properly
@@ -347,15 +366,19 @@ fn main() {
                     }
 
                     if verbose {
-                        match current_tile {
-                            Pipe::Entry => print!("S"),
-                            Pipe::Ground => print!("O"),
-                            Pipe::Horizontal => print!("═"),
-                            Pipe::LeftDown => print!("╗"),
-                            Pipe::LeftUp => print!("╝"),
-                            Pipe::RightDown => print!("╔"),
-                            Pipe::RightUp => print!("╚"),
-                            Pipe::Vertical => print!("║"),
+                        if (x, y) == (starting_x, starting_y) {
+                            print!("S");
+                        } else {
+                            match current_tile {
+                                Pipe::Entry => print!("S"),
+                                Pipe::Ground => print!("O"),
+                                Pipe::Horizontal => print!("═"),
+                                Pipe::LeftDown => print!("╗"),
+                                Pipe::LeftUp => print!("╝"),
+                                Pipe::RightDown => print!("╔"),
+                                Pipe::RightUp => print!("╚"),
+                                Pipe::Vertical => print!("║"),
+                            }
                         }
                     }
                 } else if pipe_count % 2 == 1 && verbose {
